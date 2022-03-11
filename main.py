@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation 
 import numpy as np 
 
-PART_NUM = 5
+PART_NUM = 7
 X_LIM = 10
 Y_LIM = 10
 START = 0

@@ -18,7 +18,17 @@ def init_particles(num, x_lim, y_lim):
     return np.array(_particles)
 
 
-def calc_forces(_particles, time_moment):
+def calc_forces(_particles, time_moment, x_lim, y_lim):
+    directions = [
+            [-1, -1],
+            [-1, 0],
+            [-1, 1],
+            [0, 1],
+            [1, 1],
+            [1, 0],
+            [1, -1],
+            [0, -1]
+    ]
     for i in range(len(_particles)):
         _particles[i].fx = 0
         _particles[i].fy = 0
@@ -26,14 +36,15 @@ def calc_forces(_particles, time_moment):
             if i != j: 
                 dist = ((_particles[i].xs[time_moment] - _particles[j].xs[time_moment])**2 + 
                            (_particles[i].ys[time_moment] - _particles[j].ys[time_moment])**2)**0.5
+                        
                 force = F(dist)
                 
                 cos_phi = (_particles[j].xs[time_moment] - _particles[i].xs[time_moment]) / dist
                 sin_phi = (_particles[j].ys[time_moment] - _particles[i].ys[time_moment]) / dist 
-
+                
                 _particles[i].fx += force * cos_phi
                 _particles[i].fy += force * sin_phi
-    
+
                 
 def integrate(_particles, start, stop, step, x_lim, y_lim):
     steps = int((stop - start) / step)
@@ -50,7 +61,7 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
         obj.vx_update(second_vx)
         obj.vy_update(second_vy)
         
-    calc_forces(_particles, time_moment=1)
+    calc_forces(_particles, time_moment=1, x_lim=x_lim, y_lim=y_lim)
     
     for i in range(2, steps):
         for j in range(len(_particles)):
@@ -63,7 +74,7 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
             _particles[j].y = 2 * _particles[j].ys[i-1] - _particles[j].ys[i-2] + _particles[j].fy / _particles[j].m * step**2
             _particles[j].x_update( _particles[j].x % x_lim )
             _particles[j].y_update( _particles[j].y % y_lim )
-        calc_forces(_particles, time_moment=i)
+        calc_forces(_particles, time_moment=i, x_lim=x_lim, y_lim=y_lim)
 
 def get_energy(_particles):        
     for i in range(len(_particles)):
