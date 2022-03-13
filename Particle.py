@@ -13,9 +13,9 @@ class Particle:
         self.vys = [vy_0]
         self.fxs = [0]
         self.fys = [0]
-    def x_update(self, new_x, active=False):
+    def x_update(self, new_x):
         self.xs.append(new_x)
-    def y_update(self, new_y, active=False):
+    def y_update(self, new_y):
         self.ys.append(new_y)
     def vx_update(self, new_vx):
         self.vxs.append(new_vx)

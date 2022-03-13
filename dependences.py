@@ -1,5 +1,5 @@
 EPS = 1
-SIGM = 1
+SIGM = 2
 
 def U(r):
     return 4 * EPS * ((SIGM/r)**12 - (SIGM/r)**6)

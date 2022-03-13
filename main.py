@@ -2,8 +2,7 @@ from functions import init_particles, integrate, get_energy
 import matplotlib.pyplot as plt 
 import matplotlib.animation as animation 
 
-
-PART_NUM = 10
+PART_NUM = 5
 X_LIM = 10
 Y_LIM = 10
 START = 0
@@ -20,9 +19,11 @@ particles = init_particles(PART_NUM, X_LIM, Y_LIM)
 
 integrate(particles, START, STOP, STEP, X_LIM, Y_LIM)
 
-k_e, p_e, t_e = get_energy(particles)
+k_e, p_e, t_e = get_energy(particles, X_LIM, Y_LIM)
 
-plt.plot(t_e)
+# =============================================================================
+# plt.plot(t_e)
+# =============================================================================
 
 # animation
 fig, ax = plt.subplots()
@@ -31,7 +32,7 @@ plt.grid(True)
 lines=[]
 
 for i in range(len(particles)):
-    line, = ax.plot([], [], 'o')
+    line, = ax.plot([], [], '.')
     lines.append(line,)
     
 def animation_frame(n):
