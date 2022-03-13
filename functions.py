@@ -19,31 +19,29 @@ def init_particles(num, x_lim, y_lim):
 
 
 def calc_forces(_particles, time_moment, x_lim, y_lim):
-    directions = [
-            [-1, -1],
-            [-1, 0],
-            [-1, 1],
-            [0, 1],
-            [1, 1],
-            [1, 0],
-            [1, -1],
-            [0, -1]
-    ]
     for i in range(len(_particles)):
         _particles[i].fx = 0
         _particles[i].fy = 0
         for j in range(len(_particles)):
             if i != j: 
-                dist = ((_particles[i].xs[time_moment] - _particles[j].xs[time_moment])**2 + 
-                           (_particles[i].ys[time_moment] - _particles[j].ys[time_moment])**2)**0.5
-                        
+                dist_x = _particles[i].xs[time_moment] - _particles[j].xs[time_moment]
+                dist_y = _particles[i].ys[time_moment] - _particles[j].ys[time_moment]                
+                              
+                # boundary conditions
+                if abs(dist_x) > x_lim / 2:
+                    dist_x = dist_x - np.sign(dist_x) * x_lim
+                if abs(dist_y) > y_lim / 2:
+                    dist_y = dist_y - np.sign(dist_y) * y_lim
+                
+                dist = (dist_x**2 + dist_y**2)**0.5
+                
                 force = F(dist)
                 
-                cos_phi = (_particles[j].xs[time_moment] - _particles[i].xs[time_moment]) / dist
-                sin_phi = (_particles[j].ys[time_moment] - _particles[i].ys[time_moment]) / dist 
-                
-                _particles[i].fx += force * cos_phi
-                _particles[i].fy += force * sin_phi
+                cos_phi = -dist_x / dist
+                sin_phi = -dist_y / dist 
+                                
+                _particles[i].fx += force * cos_phi 
+                _particles[i].fy += force * sin_phi 
 
                 
 def integrate(_particles, start, stop, step, x_lim, y_lim):
@@ -56,8 +54,8 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
         second_y = 2 * obj.ys[0] - y_verlet + obj.fy * step**2 / obj.m
         second_vx = (second_x - obj.xs[0]) / step
         second_vy = (second_y - obj.ys[0]) / step
-        obj.x_update(second_x)
-        obj.y_update(second_y)
+        obj.x_update(second_x % x_lim)
+        obj.y_update(second_y % y_lim)
         obj.vx_update(second_vx)
         obj.vy_update(second_vy)
         
@@ -91,4 +89,35 @@ def get_energy(_particles):
         
     return sum(kin_energy), sum(pot_energy), sum(kin_energy) + sum(pot_energy)
                 
-                
+def special_init(par1, par2):
+    _particles = []
+    particle1 = Particle(
+            m = par1[0],
+            x_0 = par1[1],
+            y_0 = par1[2], 
+            vx_0 = par1[3],
+            vy_0 = par1[4]
+        )
+    particle2 = Particle(
+            m = par2[0],
+            x_0 = par2[1],
+            y_0 = par2[2], 
+            vx_0 = par2[3],
+            vy_0 = par2[4]
+        )
+    _particles.append(particle1)
+    _particles.append(particle2)
+    
+    return np.array(_particles)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -1,14 +1,20 @@
-from functions import init_particles, integrate, get_energy 
+from functions import init_particles, integrate, get_energy
 import matplotlib.pyplot as plt 
 import matplotlib.animation as animation 
-import numpy as np 
 
-PART_NUM = 7
+
+PART_NUM = 10
 X_LIM = 10
 Y_LIM = 10
 START = 0
 STOP = 10
 STEP = 0.01
+
+# =============================================================================
+# params1 = [1, 1.5, 5, -0, 0]
+# params2 = [1, 9.5, 5, 0, 0]
+# particles = special_init(params1, params2)
+# =============================================================================
 
 particles = init_particles(PART_NUM, X_LIM, Y_LIM)
 
@@ -16,8 +22,7 @@ integrate(particles, START, STOP, STEP, X_LIM, Y_LIM)
 
 k_e, p_e, t_e = get_energy(particles)
 
-plt.plot(np.linspace(START, STOP, int((STOP-START)/STEP)), t_e)
-
+plt.plot(t_e)
 
 # animation
 fig, ax = plt.subplots()
