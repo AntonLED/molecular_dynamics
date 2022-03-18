@@ -62,17 +62,27 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
     calc_forces(_particles, time_moment=1, x_lim=x_lim, y_lim=y_lim)
     
     for i in range(2, steps):
-        for j in range(len(_particles)):            
+        for j in range(len(_particles)):  
+            
+            dx = _particles[j].xs[i-1] - _particles[j].xs[i-2]
+            dy = _particles[j].ys[i-1] - _particles[j].ys[i-2]
+            if abs(dx) > x_lim / 2:
+                dx = dx - np.sign(dx) * x_lim
+            if abs(dy) > y_lim / 2:
+                dy = dy - np.sign(dy) * y_lim
+            dx = np.sign(dx) * (abs(dx) % x_lim)
+            dy = np.sign(dy) * (abs(dy) % y_lim)
+            _particles[j].vx = dx / step
+            _particles[j].vy = dy / step
+            _particles[j].vx_update( _particles[j].vx )
+            _particles[j].vy_update( _particles[j].vy )
+            
             _particles[j].x = 2 * _particles[j].xs[i-1] - _particles[j].xs[i-2] + _particles[j].fx / _particles[j].m * step**2
             _particles[j].y = 2 * _particles[j].ys[i-1] - _particles[j].ys[i-2] + _particles[j].fy / _particles[j].m * step**2
             _particles[j].x_update( _particles[j].x % x_lim )
-            _particles[j].y_update( _particles[j].y % y_lim )
-            
-            _particles[j].vx = ((_particles[j].xs[i-1] - _particles[j].xs[i-2]) % x_lim) / step
-            _particles[j].vy = ((_particles[j].ys[i-1] - _particles[j].ys[i-2]) % y_lim) / step
-            _particles[j].vx_update( _particles[j].vx )
-            _particles[j].vy_update( _particles[j].vy )
+            _particles[j].y_update( _particles[j].y % y_lim )   
         calc_forces(_particles, time_moment=i, x_lim=x_lim, y_lim=y_lim)
+
 
 def get_energy(_particles, x_lim, y_lim): 
     particles_potential = []
@@ -88,7 +98,7 @@ def get_energy(_particles, x_lim, y_lim):
                 for d_y in dist_y:
                     if abs(d_y) > y_lim / 2:
                         d_y = d_y - np.sign(d_y) * y_lim
-                        
+                            
                 dist = (dist_x**2 + dist_y**2)**0.5
                 particles_potential.append(U(dist))
     system_potential = sum(particles_potential)    
@@ -99,6 +109,7 @@ def get_energy(_particles, x_lim, y_lim):
     system_kinetic = sum(particles_kinetic)
     
     return system_kinetic, system_potential, system_kinetic + system_potential
+
                 
 def special_init(par1, par2):
     _particles = []
