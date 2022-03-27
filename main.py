@@ -1,10 +1,11 @@
 from functions import init_particles, integrate, get_energy, special_init
 import matplotlib.pyplot as plt 
 import matplotlib.animation as animation 
+import numpy as np 
 
-PART_NUM = 4
-X_LIM = 10
-Y_LIM = 10
+PART_NUM = 150
+X_LIM = 50
+Y_LIM = 50
 START = 0
 STOP = 10
 STEP = 0.01
@@ -15,14 +16,17 @@ STEP = 0.01
 # particles = special_init(params1, params2)
 # =============================================================================
 
+
 particles = init_particles(PART_NUM, X_LIM, Y_LIM)
 
 integrate(particles, START, STOP, STEP, X_LIM, Y_LIM)
 
 k_e, p_e, t_e = get_energy(particles, X_LIM, Y_LIM)
+    
 
-plt.plot(k_e)
-plt.plot(p_e)
+plt.plot(np.linspace(START, STOP, int(STOP - START) / STEP), k_e, color="red")
+plt.plot(np.linspace(START, STOP, int(STOP - START) / STEP), p_e, color="green")
+plt.plot(np.linspace(START, STOP, int(STOP - START) / STEP), t_e, color="black")
 
 
 # animation
@@ -32,7 +36,7 @@ plt.grid(True)
 lines=[]
 
 for i in range(len(particles)):
-    line, = ax.plot([], [], 'o')
+    line, = ax.plot([], [], '.')
     lines.append(line,)
     
 def animation_frame(n):

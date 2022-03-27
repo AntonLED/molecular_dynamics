@@ -9,11 +9,11 @@ def init_particles(num, x_lim, y_lim):
     for i in range(num):
         _particles.append(
                 Particle(
-                m=random.randint(1, 2), 
+                m=0.039948, 
                 x_0=random.randint(0, x_lim), 
                 y_0=random.randint(0, y_lim), 
-                vx_0=random.randint(-3, 3), 
-                vy_0=random.randint(-3, 3)
+                vx_0=0, 
+                vy_0=0
                 ))
     return np.array(_particles)
 
@@ -32,14 +32,11 @@ def calc_forces(_particles, time_moment, x_lim, y_lim):
                     dist_x = dist_x - np.sign(dist_x) * x_lim
                 if abs(dist_y) > y_lim / 2:
                     dist_y = dist_y - np.sign(dist_y) * y_lim
-                
+
                 dist = (dist_x**2 + dist_y**2)**0.5
-                
                 force = F(dist)
-                
                 cos_phi = -dist_x / dist
                 sin_phi = -dist_y / dist 
-                                
                 _particles[i].fx += force * cos_phi 
                 _particles[i].fy += force * sin_phi 
 
@@ -50,8 +47,8 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
     for particle in _particles:
         x_verlet = particle.xs[0] - particle.vxs[0] * step
         y_verlet = particle.ys[0] - particle.vys[0] * step
-        second_x = 2 * particle.xs[0] - x_verlet + particle.fx * step**2 / particle.m
-        second_y = 2 * particle.ys[0] - y_verlet + particle.fy * step**2 / particle.m
+        second_x = 2 * particle.xs[0] - x_verlet + 1e-10 * particle.fx / particle.m * step**2 
+        second_y = 2 * particle.ys[0] - y_verlet + 1e-10 * particle.fy / particle.m * step**2
         second_vx = (second_x - particle.xs[0]) / step
         second_vy = (second_y - particle.ys[0]) / step
         particle.x_update(second_x % x_lim)
@@ -63,7 +60,6 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
     
     for i in range(2, steps):
         for j in range(len(_particles)):  
-            
             dx = _particles[j].xs[i-1] - _particles[j].xs[i-2]
             dy = _particles[j].ys[i-1] - _particles[j].ys[i-2]
             if abs(dx) > x_lim / 2:
@@ -77,8 +73,8 @@ def integrate(_particles, start, stop, step, x_lim, y_lim):
             _particles[j].vx_update( _particles[j].vx )
             _particles[j].vy_update( _particles[j].vy )
             
-            _particles[j].x = 2 * _particles[j].xs[i-1] - _particles[j].xs[i-2] + _particles[j].fx / _particles[j].m * step**2
-            _particles[j].y = 2 * _particles[j].ys[i-1] - _particles[j].ys[i-2] + _particles[j].fy / _particles[j].m * step**2
+            _particles[j].x = 2 * _particles[j].xs[i-1] - _particles[j].xs[i-2] + 1e-10 * (_particles[j].fx / _particles[j].m) * step**2
+            _particles[j].y = 2 * _particles[j].ys[i-1] - _particles[j].ys[i-2] + 1e-10 * (_particles[j].fy / _particles[j].m) * step**2
             _particles[j].x_update( _particles[j].x % x_lim )
             _particles[j].y_update( _particles[j].y % y_lim )   
         calc_forces(_particles, time_moment=i, x_lim=x_lim, y_lim=y_lim)
@@ -88,7 +84,7 @@ def get_energy(_particles, x_lim, y_lim):
     particles_potential = []
     for i in range(len(_particles)):
         for j in range(len(_particles)):
-            if i != j:
+            if j > i:
                 dist_x = np.array(_particles[i].xs) - np.array(_particles[j].xs)
                 dist_y = np.array(_particles[i].ys) - np.array(_particles[j].ys)
                 
@@ -100,13 +96,13 @@ def get_energy(_particles, x_lim, y_lim):
                         d_y = d_y - np.sign(d_y) * y_lim
                             
                 dist = (dist_x**2 + dist_y**2)**0.5
-                particles_potential.append(U(dist))
-    system_potential = sum(particles_potential)    
-            
+                particles_potential.append(U(dist) / 10)
+    system_potential = sum(particles_potential)
+    
     particles_kinetic = []
     for particle in _particles:
-        particles_kinetic.append(particle.m * (np.array(particle.vxs)**2 + np.array(particle.vys)**2) / 2)
-    system_kinetic = sum(particles_kinetic)
+        particles_kinetic.append(particle.m * (np.array(particle.vxs)**2 + np.array(particle.vys)**2) * 1e10 / 2)
+    system_kinetic = sum(particles_kinetic) 
     
     return system_kinetic, system_potential, system_kinetic + system_potential
 
